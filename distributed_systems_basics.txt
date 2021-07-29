@@ -1,0 +1,32 @@
+
+##################
+# Message Passing
+##################
+
+https://aeroncookbook.com/distributed-systems-basics/message-passing/
+
+- distributed systems built either:
+synchronous rpc
+asynchronous message passing
+
+- advantages of async mp:
+1. loosely coupled
+2. resiliency - primary component failure can be serviced by secondary, transparent to sender
+3. simpler to implement
+4. consume less resources
+
+- Agrona and Aeron enable developers to build reactive systems built with message passing
+- Agrona's RingBuffer is the basic: https://aeroncookbook.com/agrona/concurrent/#ring-buffers
+- uses large scale multicast
+- approach to writing the business logic remains consistent — react to an inbound message and produce zero or more outbound messages
+
+
+############################
+# Replicated State Machines
+############################
+
+https://aeroncookbook.com/distributed-systems-basics/replicated-state-machines/
+
+- for building fault-tolerant services with distributed systems
+- different than state machine design pattern
+
