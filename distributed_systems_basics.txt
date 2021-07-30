@@ -5,7 +5,7 @@
 
 https://aeroncookbook.com/distributed-systems-basics/message-passing/
 
-- distributed systems built either:
+- distributed systems are built either using:
 synchronous rpc
 asynchronous message passing
 
@@ -30,3 +30,26 @@ https://aeroncookbook.com/distributed-systems-basics/replicated-state-machines/
 - for building fault-tolerant services with distributed systems
 - different than state machine design pattern
 
+- features:
+1. encodes its states internally
+2. accepts commands that address a single method
+3. deterministic methods process each command
+4. commands mutate state and/or produce events
+5. Snapshots - rsm internal state to be captured at a moment of time
+6. Set - rsm internal state to be set to a given value
+
+commands -> single deterministic methods -> produce events
+
+- many rsm, when follow above rules will process commands in order and produce same events and same internal state
+- how to get different rsm agree on order of commands from concurrent client requests and failures => Consensus Algorithms
+- using the snapshot and set, we can us it for recovery - save the snapshot at any stage and set it back to that snapshot whenever needed in future
+
+- in Simple State Machine code,rsm state is defined by the order of commands
+- this helps to have a fully deterministic ordering of input events
+- Aeron Cluster define its own commands and events, along with code to build a snapshot and restore from a snapshot
+- Aeron and Aeron Archive provide total ordering capablities within a single channel and stream
+
+
+##################
+# Logical Clocks
+##################
