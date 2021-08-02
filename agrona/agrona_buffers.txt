@@ -1,0 +1,78 @@
+## Agrona
+High-performance data structures and utility methods for Java
+
+##########
+# Buffers
+##########
+http://insightfullogic.com/2015/Apr/18/agronas-threadsafe-offheap-buffers/
+
+# Deficiencies of Java ByteBuffer
+https://www.mindprod.com/jgloss/bytebuffer.html
+
+- Java provides ByteBuffer class to wrap both offheap and onheap memory
+- Bytebuffers are specifically used in the Java networking stack as a places for data to be read from or written into
+- don't offer support for atomic operations
+- If want to write an offheap data structure that's concurrently accessed from different processes, then ByteBuffer don't address it
+- might want to write to a message queue that one process will read from and another will write to - Producer/Consumer pattern
+
+
+# Agrona's Buffer
+- these buffers are used by Aeron and SBE:
+DirectBuffer - the top level interface that provides the ability to read values from the buffer
+MutableDirectBuffer - extends DirectBuffer adding operations for writing to the buffer
+AtomicBuffer - adds atomic operations and compare-and-swap semantics
+UnsafeBuffer - default implementation - backing implementation uses sun.misc.Unsafe =>
+               https://www.baeldung.com/java-unsafe; https://www.baeldung.com/java-foreign-memory-access
+
+- different buffers so that components which only want to read should only use DirectBuffer
+- similarly, single threaded components should not use AtomicBuffer
+
+
+# Wrapping underlying memory (off heap)
+- to work with buffer, need to know where the buffer begins with (just like arrays)
+- All the methods for wrapping memory are called wrap() and can wrap a byte[], ByteBuffer or DirectBuffer
+- can also specify an offset and length with which to wrap the data structures
+- example:
+wrap a byte[] =>
+        final int offset = 0;
+        final int length = 5;
+        buffer.wrap(new byte[length], offset, length);
+
+- another way to wrap is pass the address of memory
+- example:
+        final int length = 10;
+        final long address = unsafe.allocateMemory(length);
+        buffer.wrap(address, length);
+
+- Wrapping the memory also sets up the capacity of the buffer, which can be accessed via the capacity() method
+
+# Accessors
+- once we have the buffer, we can read/write data to it
+- each getter starts with get
+- example:
+        final int address = 0;
+        long value = buffer.getLong(address, ByteOrder.BIG_ENDIAN);
+        value++;
+        buffer.putLong(address, value, ByteOrder.BIG_ENDIAN);
+
+- if byte order is not given, it uses machine's native order
+
+- besides primitives, can also read/write byte[], ByteBuffer or DirectBuffer
+- example:
+        final int offsetInBuffer = 0;
+        final int offsetInResult = 0;
+        final int length = 5;
+        final byte[] result = new byte[length];
+        buffer.getBytes(offsetInBuffer, result, offsetInResult, length, result);
+
+# Concurrent operations
+- int and long values can also be read or written with "memory ordering" semantics
+- Methods suffixed with Ordered guarantee that they will eventually be set to the value in question,
+and that value will eventually be visible from another thread doing a volatile read on the value.
+- example:
+putLongOrdered automatically performs a store-store "memory barrier" => https://en.wikipedia.org/wiki/Memory_barrier
+
+- get*Volatile and put*Volatile follow the same ordering semantics as reads and writes to variables declared with the volatile keyword would in Java
+https://www.baeldung.com/java-volatile
+
+
