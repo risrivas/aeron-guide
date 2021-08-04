@@ -1,0 +1,39 @@
+###########
+# Abstract
+###########
+https://lmax-exchange.github.io/disruptor/disruptor.html
+
+- develop a very high performant exchange or matching engine
+- basic caveat in producer/consumer pattern is using queues
+- how modern CPU's work - this is mechanical sympathy
+- ideal for any "asynchronous event processing" architecture where high-throughput and low-latency is required
+- LMAX has built - order matching engine, real-time risk management, HA in-memory transaction processing system
+- Disruptor has less write contention, lower concurrency overhead and more cache friendly
+all of which results in greater throughput with less jitter at lower latency
+- maximum: 25 million messages per second and latencies lower than 50 nanoseconds
+- very close to the theoretical limit of a modern processor to exchange data between cores
+
+
+###########
+# Overview
+###########
+- derived from designs of SEDA and Actor - use pipelines for throughput
+https://github.com/mdwelsh/mdwelsh.github.io/blob/master/papers/seda-sosp01.pdf
+http://dspace.mit.edu/handle/1721.1/6952
+
+- Queues are the bottleneck
+
+
+##############################
+# Complexities of Concurrency
+##############################
+- parallel tasks contending for shared resources: database, file, socket, location in memory
+- concurrent execution:
+mutual exclusion = managing contended "updates" to some resource
+visibility of change = controlling when such changes are made visible to "other threads"
+
+- possible to remove the need of mutual exclusion if only 1 thread is updating
+- The most costly operation in any concurrent environment is a "contended write access"
+- if multiple threads try to update / write - then we need locking
+
+## Costs of Locks
