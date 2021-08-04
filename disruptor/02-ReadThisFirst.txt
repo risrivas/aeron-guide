@@ -37,3 +37,63 @@ visibility of change = controlling when such changes are made visible to "other 
 - if multiple threads try to update / write - then we need locking
 
 ## Costs of Locks
+- locks provide mutual exclusion
+- very expensive if context switch happens as all the cached data and instructions are lost
+
+## Costs of "CAS"
+- better than locks as no context switch happens
+- CPU has CAS operation - "lock cmpxchg"
+- allows a word in memory to be "updated" in atomic way
+- expected value and to-update value are provided as arguments
+- caveat: CPU must "lock its instruction pipeline" to ensure atomicity and employ a "memory barrier" to make the changes visible to other threads
+- its complex to implement
+
+- ideal algorithm: single thread owning all writes to a single resource while other threads just reading the result
+
+##################
+# Memory Barriers
+##################
+- to read the results in a multi-threaded / multi-core / multi-processor,
+it requires "memory barrier" to make the changes visible to threads running on "other" processors
+
+- CPUs perform this for achieving maximum performnace:
+out-of-order execution of instructions
+out-of-order loads and stores of data between memory and execution units
+
+- when multiple threads share state, then memory changes should appear in order for data exchange to be successful
+- thats where CPUs use memory barrier for section of codes that requires memory ordering => hardware barriers
+- compilers can also put "software barriers" to ensure ordering of compiled code
+- CPUs are much faster than memory systems
+- thus, CPUs use complex cache system - fast hardware cache tables without chaining
+- "cache coherency" amongst other CPUs using "message passing" protocols
+
+- CPUs have "store buffers" to offload writes to these caches
+- CPUs have "invalidate queues" which helps to invalidate cache used by "cache coherency" protocols
+
+- Latest updated data can be anywhere
+register
+store buffer
+one of many layers of cache (L1 / L2 / L3)
+main memory (RAM)
+
+- for making this data visible to other threads - this is done by coordinated exchange of cache coherency messages
+- timely generation of these messages is controlled by memory barriers
+
+# Read memory barrier
+- orders load instructions on the CPU that executes it by marking a point in the "invalidate queue" for changes coming into its own cache
+- this guarantees the latest updated value which was written "before" the read barrier
+
+# Write memory barrier
+- orders store instructions on the CPU that executes it by marking a point in the "store buffer" thus flushing writes out via its own cache
+- this guarantees of what store operations happened "before" the write barrier
+
+# Full memory barrier
+- orders both load and store instructions on the CPU that executes it
+
+- In Java, read/write of volatile field implements the read and write barriers respectively
+
+
+
+
+
+
