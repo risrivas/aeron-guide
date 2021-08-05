@@ -14,9 +14,9 @@ all of which results in greater throughput with less jitter at lower latency
 - very close to the theoretical limit of a modern processor to exchange data between cores
 
 
-###########
-# Overview
-###########
+##############
+# 1. Overview
+##############
 - derived from designs of SEDA and Actor - use pipelines for throughput
 https://github.com/mdwelsh/mdwelsh.github.io/blob/master/papers/seda-sosp01.pdf
 http://dspace.mit.edu/handle/1721.1/6952
@@ -24,9 +24,9 @@ http://dspace.mit.edu/handle/1721.1/6952
 - Queues are the bottleneck
 
 
-##############################
-# Complexities of Concurrency
-##############################
+#################################
+# 2. Complexities of Concurrency
+#################################
 - parallel tasks contending for shared resources: database, file, socket, location in memory
 - concurrent execution:
 mutual exclusion = managing contended "updates" to some resource
@@ -50,9 +50,9 @@ visibility of change = controlling when such changes are made visible to "other 
 
 - ideal algorithm: single thread owning all writes to a single resource while other threads just reading the result
 
-##################
-# Memory Barriers
-##################
+######################
+# 2.1 Memory Barriers
+######################
 - to read the results in a multi-threaded / multi-core / multi-processor,
 it requires "memory barrier" to make the changes visible to threads running on "other" processors
 
@@ -93,7 +93,56 @@ main memory (RAM)
 - In Java, read/write of volatile field implements the read and write barriers respectively
 
 
+###################
+# 2.2 Cache Lines
+###################
+- trips to main memory to fetch data is very expensive
+- cache-miss is very expensive
+
+- level of granularity at which "cache coherency" protocols operate:
+caches are organised into cache-lines that are typically 32-256 bytes in size, the most common cache-line being 64 bytes
+
+- “false sharing”:
+if two variables are in the same cache line, and they are written to by different threads, then they present the same problems of write contention as if they were a single variable
+- For high performance then, it is important to ensure that independent, but concurrently written, variables do not share the same cache-line if contention is to be minimised
+
+- pre-fetch of 2KB data into cache-lines is done by the CPUs - that's why arrays are so fast
+
+
+#########################
+# 2.3 Problems of Queues
+#########################
+- Queues use linked-lists or arrays for underlying storage
+- if unbounded and producers outpace consumers, out of memory error
+- write contention on head, tail, size
+- always queue is empty or full - never in the mid - as its very rare to have speed of producer and consumer
+- source of garbage - objects allocated and placed on the queue; if linked-list backed then more object creation overhead
+
+
+###########################
+# 2.4 Pipelines and Graphs
+###########################
+- wire together several processing stages into pipelines
+- pipelines have parallel paths organised into graph-like topologies
+- links between each stage are implemented by queues with each stage having its own thread
+- at each stage, need to incur the cost of en-queuing and de-queuing units of work
+- number of targets multiplies this cost when the path must fork, and incurs an inevitable cost of contention when it must re-join after such a fork
+- ideally, the graph of dependencies could be expressed without incurring the cost of putting the queues between stages
 
 
 
+##################################
+# 3. Design of the LMAX Disruptor
+##################################
+- any data should be owned by only one thread for write access, therefore eliminating write contention
+- elements of similarity for dealing with graphs of dependencies to the concept of “Phasers” in Java 7, introduced to support Fork-Join
+https://www.baeldung.com/java-phaser
+
+- pre-allocated bounded data structure in the form of a "ring-buffer"
+- Data is added to the ring buffer through one or more producers and processed by one or more consumers
+
+
+#########################
+# 3.1. Memory Allocation
+#########################
 
