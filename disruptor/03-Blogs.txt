@@ -1,0 +1,77 @@
+###########################################
+# 1. What's so special about a ring buffer?
+###########################################
+http://mechanitis.blogspot.com/2011/06/dissecting-disruptor-whats-so-special.html
+
+## Ring Buffer
+- use it as a buffer to pass stuff from one context (one thread) to another
+- an array with a pointer to the next available slot
+- we keep filling up the buffer (and presumable reading from it too), the sequence keeps incrementing, wrapping around the ring
+- always design the array with length as power of 2
+
+- to find the slot in the array that the current sequence points to, use a mod operation:
+sequence % array length = array index
+
+- reliable messaging:
+if current sequence is 12, and there is a read request with sequence 10, simply all the messages are sent from 10 to 12
+
+- items in the buffer are only over-written (when wrapped) - never deleted
+- decision whether "should wrap or not" is done by producer / consumer - not inside the ring buffer
+
+- benefits:
+faster as its an array - cpu cache friendly (memory striding)
+can pre-allocate the ring-buffer items up front, making the objects effectively immortal => means no garbage collection
+Queues usually take care of all the stuff like the start and end of the queue, adding and consuming items, and so forth
+However, Ring Buffer itself isn't responsible for these things, these concerns are moved outside of the data structure
+
+
+####################################
+# 2. How to read from a ring buffer?
+####################################
+http://mechanitis.blogspot.com/2011/06/dissecting-disruptor-how-do-i-read-from.html
+
+- Consumer thread has access to ConsumerBarrier, which is created by the RingBuffer and interacts with it on behalf of the Consumer
+- each consumer needs to be able to figure out which sequence number it's expecting to see next
+- example:
+Consumer is at 8, so expecting 9
+so nextSequence = 9
+
+Consumer calls waitFor() on the ConsumerBarrier with the sequence number it wants next
+  final long availableSeq = consumerBarrier.waitFor(nextSequence);
+
+ConsumerBarrier calls getCursor() and gets the highest sequence number available in the ring buffer - in the example above, 12
+ConsumerBarrier returns the highest sequence number available in the ring buffer
+ConsumerBarrier has a WaitStrategy which it uses to decide how to wait for this sequence number
+
+Consumer ask the ConsumerBarrier to fetch the entries 9 to 12 via getEntry(9), getEntry(10)...
+As it's fetching them, the Consumer is updating its own cursor
+it's easy to deal with the whole batch of entries processed (e.g. from 9-12 above) without having to fetch each one individually
+NO LOCKING - multiple Consumers reading off the same RingBuffer, with no need for locks and no need for additional queues to coordinate between the different threads
+
+Consumer classes: BatchConsumer, BatchHandler
+
+
+####################################
+# 3. How to write to a ring buffer?
+####################################
+http://mechanitis.blogspot.com/2011/07/dissecting-disruptor-writing-to-ring.html
+
+- important areas are:
+not wrapping the ring
+informing the consumers
+batching for producers
+how multiple producers work
+
+# ProducerBarrier
+- ProducerBarrier is created by the ring buffer and producer will use this to write to it
+
+- Writing to the ring buffer involves a two-phase commit:
+First, producer has to claim the next slot on the buffer
+Then, when the producer has finished writing to the slot, it will call commit on the ProducerBarrier
+
+- First, producer has to claim the next slot on the buffer
+Producer call nextEntry() on the ProducerBarrier
+This will return an Entry object which is basically the next slot in the ring buffer
+
+
+
