@@ -75,3 +75,15 @@ This will return an Entry object which is basically the next slot in the ring bu
 
 
 
+
+
+########################
+# Disruptor 2.0 changes
+########################
+http://mechanitis.blogspot.com/2011/08/disruptor-20-all-change-please.html
+
+Producer => Publisher
+ProducerBarrier => PublishPort
+ConsumerBarrier => DependencyBarrier
+Consumer => EventProcessor
+Entry => Event
