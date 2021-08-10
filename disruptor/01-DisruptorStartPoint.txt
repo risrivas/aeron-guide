@@ -1,10 +1,12 @@
 # Main link to start from:
 https://lmax-exchange.github.io/disruptor/
 
+# Blogs
+https://github.com/LMAX-Exchange/disruptor/wiki/Blogs-And-Articles
+
 # Read this first
 https://lmax-exchange.github.io/disruptor/disruptor.html
 
-# Blogs
-https://github.com/LMAX-Exchange/disruptor/wiki/Blogs-And-Articles
+
 
 

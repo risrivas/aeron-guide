@@ -1,7 +1,7 @@
 ###########################################
 # 1. What's so special about a ring buffer?
 ###########################################
-http://mechanitis.blogspot.com/2011/06/dissecting-disruptor-whats-so-special.html
+https://trishagee.com/2011/06/22/dissecting_the_disruptor_whats_so_special_about_a_ring_buffer/
 
 ## Ring Buffer
 - use it as a buffer to pass stuff from one context (one thread) to another
@@ -24,11 +24,17 @@ can pre-allocate the ring-buffer items up front, making the objects effectively 
 Queues usually take care of all the stuff like the start and end of the queue, adding and consuming items, and so forth
 However, Ring Buffer itself isn't responsible for these things, these concerns are moved outside of the data structure
 
+- infoQ video
+https://www.infoq.com/presentations/LMAX/
 
 ####################################
 # 2. How to read from a ring buffer?
 ####################################
-http://mechanitis.blogspot.com/2011/06/dissecting-disruptor-how-do-i-read-from.html
+https://trishagee.com/2011/06/28/dissecting_the_disruptor_how_do_i_read_from_the_ring_buffer/
+
+ConsumerBarrier => DependencyBarrier
+Consumer => EventProcessor
+Entry => Event
 
 - Consumer thread has access to ConsumerBarrier, which is created by the RingBuffer and interacts with it on behalf of the Consumer
 - each consumer needs to be able to figure out which sequence number it's expecting to see next
@@ -36,7 +42,9 @@ http://mechanitis.blogspot.com/2011/06/dissecting-disruptor-how-do-i-read-from.h
 Consumer is at 8, so expecting 9
 so nextSequence = 9
 
-Consumer calls waitFor() on the ConsumerBarrier with the sequence number it wants next
+- terms: waitFor(), getCursor(), WaitStrategy
+
+Consumer calls waitFor() on the ConsumerBarrier with the sequence number it wants next:
   final long availableSeq = consumerBarrier.waitFor(nextSequence);
 
 ConsumerBarrier calls getCursor() and gets the highest sequence number available in the ring buffer - in the example above, 12
@@ -48,13 +56,13 @@ As it's fetching them, the Consumer is updating its own cursor
 it's easy to deal with the whole batch of entries processed (e.g. from 9-12 above) without having to fetch each one individually
 NO LOCKING - multiple Consumers reading off the same RingBuffer, with no need for locks and no need for additional queues to coordinate between the different threads
 
-Consumer classes: BatchConsumer, BatchHandler
+Consumer classes: BatchConsumer, BatchHandler => BatchEventProcessor, EventHandler
 
 
 ####################################
 # 3. How to write to a ring buffer?
 ####################################
-http://mechanitis.blogspot.com/2011/07/dissecting-disruptor-writing-to-ring.html
+https://trishagee.com/2011/07/04/dissecting_the_disruptor_writing_to_the_ring_buffer/
 
 - important areas are:
 not wrapping the ring
@@ -80,7 +88,7 @@ This will return an Entry object which is basically the next slot in the ring bu
 ########################
 # Disruptor 2.0 changes
 ########################
-http://mechanitis.blogspot.com/2011/08/disruptor-20-all-change-please.html
+https://trishagee.com/2011/08/30/disruptor_20__all_change_please/
 
 Producer => Publisher
 ProducerBarrier => PublishPort
