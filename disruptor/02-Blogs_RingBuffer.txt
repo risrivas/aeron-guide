@@ -81,7 +81,25 @@ Then, when the producer has finished writing to the slot, it will call commit on
 Producer call nextEntry() on the ProducerBarrier
 This will return an Entry object which is basically the next slot in the ring buffer
 
+...... its easier to directly follow the blog - instead of making notes
 
+
+
+################################
+# 4. Wiring up the dependencies
+################################
+https://trishagee.com/2011/07/10/dissecting_the_disruptor_wiring_up_the_dependencies/
+
+- example code:
+ConsumerBarrier consumerBarrier1 = ringBuffer.createConsumerBarrier();
+BatchConsumer consumer1 = new BatchConsumer(consumerBarrier1, handler1);
+BatchConsumer consumer2 = new BatchConsumer(consumerBarrier1, handler2);
+ConsumerBarrier consumerBarrier2 = ringBuffer.createConsumerBarrier(consumer1, consumer2);
+BatchConsumer consumer3 = new BatchConsumer(consumerBarrier2, handler3);
+ProducerBarrier producerBarrier = ringBuffer.createProducerBarrier(consumer3);
+
+- Adrian's DSL
+https://www.symphonious.net/2011/07/11/lmax-disruptor-high-performance-low-latency-and-simple-too/
 
 
 
@@ -95,3 +113,5 @@ ProducerBarrier => PublishPort
 ConsumerBarrier => DependencyBarrier
 Consumer => EventProcessor
 Entry => Event
+
+.... 2.0 changes are also outdated, with 3.0 version having different class names
