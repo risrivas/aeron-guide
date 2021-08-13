@@ -1,0 +1,37 @@
+###################################
+# Blog 1 - Why Mechanical Sympathy
+###################################
+https://mechanical-sympathy.blogspot.com/2011/07/why-mechanical-sympathy.html
+
+- mastering the underlying hardware / machine is key to write most efficient software
+
+
+###########################
+# Blog 2 - Write Combining
+###########################
+https://mechanical-sympathy.blogspot.com/2011/07/write-combining.html
+
+- CPU tries to first write to L1 - if the cache miss happens, it will try to hold L2 cache line
+- if L2 is not available, it will store the operation or data in "line fill buffers"
+- it will write to line buffers and continue executing other instructions, until L2 is available
+- for more writes, its still "combined" write into line buffers
+- these are 64-byte buffers - same as cache line
+- for reads, the same line buffers are used before reading from L2 cache
+
+- if we can fill these line buffers before they are transferred to the outer caches, then we will greatly improve the effective use of the transfer bus at every level
+
+- there are limited number of "line buffers" available - say 4
+- so do NOT write to more than 4 distinct memory locations at one time
+
+- code example
+
+- trick is to split the loop to write to less than 4 different memory locations - say array or collection
+
+
+################################
+# Blog 3 - Let the caller chose
+################################
+https://mechanical-sympathy.blogspot.com/2011/07/let-caller-choose.html
+
+
+

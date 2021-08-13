@@ -103,6 +103,28 @@ https://www.symphonious.net/2011/07/11/lmax-disruptor-high-performance-low-laten
 
 
 
+###################
+# 5. Locks are Bad
+###################
+https://trishagee.com/2011/07/16/dissecting_the_disruptor_why_its_so_fast_part_one__locks_are_bad/
+
+
+##############################
+# 6. Magic Cache line padding
+##############################
+https://trishagee.com/2011/07/22/dissecting_the_disruptor_why_its_so_fast_part_two__magic_cache_line_padding/
+
+
+
+##################################
+# 7. Demystifying Memory Barriers
+##################################
+https://trishagee.com/2011/08/07/dissecting_the_disruptor_demystifying_memory_barriers/
+
+
+
+
+
 ########################
 # Disruptor 2.0 changes
 ########################
@@ -115,3 +137,16 @@ Consumer => EventProcessor
 Entry => Event
 
 .... 2.0 changes are also outdated, with 3.0 version having different class names
+
+
+
+######################
+# Mechanical Sympathy
+######################
+
+## False Sharing
+https://mechanical-sympathy.blogspot.com/2011/07/false-sharing.html
+
+
+
+
