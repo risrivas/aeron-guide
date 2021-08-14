@@ -33,5 +33,35 @@ https://mechanical-sympathy.blogspot.com/2011/07/write-combining.html
 ################################
 https://mechanical-sympathy.blogspot.com/2011/07/let-caller-choose.html
 
+- there are methods in java which returns a collection or array created within the method
+- example:
+String[] song = "My name is Anthony Gonsalvez".split()
+
+- if small array - young generation and cache miss
+- temp structures created as size is not known - garbage created
+- lot of CPU work
+
+- alternative - size is known
+- api should receive a pre-allocated collection / array so that method itself does not have to create a new array within
+- example:
+Collection<String> values = new ArrayList<String>();
+"My name is Anthony Gonsalvez".split(values, " ");
+
+- if array is very large, it may be allocated in old generation
+- large array may cause a compaction of the old generation resulting in a multi-second stop-the-world pause
+
+
+#######################################
+# Blog 4 - Processor Affinity - Part 1
+#######################################
+https://mechanical-sympathy.blogspot.com/2011/07/processor-affinity-part-1.html
+
+- Processor affinity, or CPU pinning or "cache affinity", enables the binding and unbinding of a process or a thread to a central processing unit (CPU) or a range of CPUs,
+so that the process or thread will execute only on the designated CPU or CPUs rather than any CPU
+
+
+
+
+
 
 
