@@ -1,4 +1,4 @@
-package org.example;
+package mechanical.sympathy;
 
 import org.junit.jupiter.api.Test;
 

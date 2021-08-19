@@ -1,4 +1,4 @@
-package org.example;
+package mechanical.sympathy;
 
 import static java.lang.System.out;
 

@@ -1,4 +1,4 @@
-package org.example;
+package mechanical.sympathy.processor.affinity;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
