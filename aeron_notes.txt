@@ -98,3 +98,22 @@ Publishers - Sender/Receiver <== Media ==> Sender/Receiver - Subscribers (full d
 
 
 
+------------------------------------------------------------------
+
+## Aeron Blogs
+
+#################
+# 1. Aeron Guide
+#################
+https://io7m.com/documents/aeron-guide/
+
+# Take 1
+
+EchoClient.create()
+- initializes a media driver and an instance of the Aeron library
+- media driver requires a directory on the filesystem within which it creates various temporary files that are memory-mapped to allow efficient thread-safe communication
+between the separate components of the library
+- takes the local address that the client will use for communication, and the address of the server to which the client will connect
+final EchoClient client = create(directory, local_address, remote_address)
+-
+
